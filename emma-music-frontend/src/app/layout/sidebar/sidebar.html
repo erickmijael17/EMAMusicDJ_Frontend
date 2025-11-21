@@ -1,0 +1,104 @@
+<aside class="sidebar" [class.collapsed]="estaColapsado()">
+  <div class="sidebar-header">
+    <div class="sidebar-logo" (click)="navegarAInicio()">
+      <div class="logo-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M16 2L20 10L28 12L22 18L24 26L16 22L8 26L10 18L4 12L12 10L16 2Z" fill="white"/>
+        </svg>
+      </div>
+      @if (!estaColapsado()) {
+        <div class="logo-text">
+          <div class="logo-title">Emma</div>
+          <div class="logo-subtitle">Music</div>
+        </div>
+      }
+    </div>
+
+    <button class="collapse-btn" (click)="toggleSidebar()" [attr.aria-label]="estaColapsado() ? 'Expandir sidebar' : 'Colapsar sidebar'">
+      <fa-icon [icon]="estaColapsado() ? iconos.next : iconos.previous"></fa-icon>
+    </button>
+  </div>
+
+  <nav class="nav-menu">
+    <a routerLink="/inicio" routerLinkActive="active" class="nav-item" [attr.aria-label]="'Ir a inicio'">
+      <fa-icon [icon]="iconos.home"></fa-icon>
+      @if (!estaColapsado()) {
+        <span>Inicio</span>
+      }
+    </a>
+
+    <a routerLink="/buscar" routerLinkActive="active" class="nav-item" [attr.aria-label]="'Buscar música'">
+      <fa-icon [icon]="iconos.search"></fa-icon>
+      @if (!estaColapsado()) {
+        <span>Buscar</span>
+      }
+    </a>
+
+    <a routerLink="/biblioteca" routerLinkActive="active" class="nav-item" [attr.aria-label]="'Ir a biblioteca'">
+      <fa-icon [icon]="iconos.library"></fa-icon>
+      @if (!estaColapsado()) {
+        <span>Tu Biblioteca</span>
+      }
+    </a>
+  </nav>
+
+  <div class="nav-divider"></div>
+
+  <nav class="nav-menu">
+    <button class="nav-item nav-item-button" (click)="crearNuevaPlaylist()" [attr.aria-label]="'Crear playlist'">
+      <fa-icon [icon]="iconos.add"></fa-icon>
+      @if (!estaColapsado()) {
+        <span>Crear playlist</span>
+      }
+    </button>
+
+    <a routerLink="/biblioteca" [queryParams]="{tab: 'favoritas'}" routerLinkActive="active" class="nav-item" [attr.aria-label]="'Canciones favoritas'">
+      <fa-icon [icon]="iconos.like"></fa-icon>
+      @if (!estaColapsado()) {
+        <span>Canciones que te gustan</span>
+      }
+    </a>
+  </nav>
+
+  @if (!estaColapsado() && playlistsRecientes().length > 0) {
+    <div class="nav-divider"></div>
+
+    <div class="playlists-section">
+      <div class="playlists-header">
+        <span class="playlists-title">Tus Playlists</span>
+        @if (hayMasPlaylists()) {
+          <button class="show-more-btn" (click)="toggleMostrarPlaylists()" [attr.aria-label]="mostrarTodasPlaylists() ? 'Mostrar menos' : 'Mostrar más'">
+            <fa-icon [icon]="mostrarTodasPlaylists() ? iconos.moreVertical : iconos.options"></fa-icon>
+          </button>
+        }
+      </div>
+
+      <nav class="playlists-list">
+        @for (playlist of playlistsVisibles(); track playlist.listaId) {
+          <a [routerLink]="['/playlists', playlist.listaId]" routerLinkActive="active" class="playlist-item" [attr.aria-label]="'Ir a playlist ' + playlist.titulo">
+            <div class="playlist-icon">
+              @if (playlist.urlImagenPortada) {
+                <img [src]="playlist.urlImagenPortada" [alt]="playlist.titulo" class="playlist-thumbnail">
+              } @else {
+                <fa-icon [icon]="iconos.playlist"></fa-icon>
+              }
+            </div>
+            <div class="playlist-info">
+              <span class="playlist-name">{{ playlist.titulo }}</span>
+              <span class="playlist-meta">{{ playlist.totalCanciones }} canciones</span>
+            </div>
+          </a>
+        }
+      </nav>
+    </div>
+  }
+
+  <div class="sidebar-footer">
+    <a routerLink="/mi-perfil" routerLinkActive="active" class="nav-item" [attr.aria-label]="'Ir a mi perfil'">
+      <fa-icon [icon]="iconos.profile"></fa-icon>
+      @if (!estaColapsado()) {
+        <span>Mi Perfil</span>
+      }
+    </a>
+  </div>
+</aside>

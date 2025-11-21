@@ -1,0 +1,121 @@
+.notificaciones-container {
+  position: fixed;
+  top: var(--space-4, 1rem);
+  right: var(--space-4, 1rem);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+  max-width: 400px;
+  pointer-events: none;
+}
+
+.notificacion {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-4, 1rem);
+  background: var(--bg-tertiary, #181818);
+  border-radius: var(--border-radius-lg, 12px);
+  border-left: 4px solid;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  pointer-events: all;
+  animation: slideIn 0.3s ease-out;
+  min-width: 320px;
+  max-width: 400px;
+
+  &--exito {
+    border-left-color: var(--success, #1db954);
+
+    .notificacion__icono {
+      color: var(--success, #1db954);
+    }
+  }
+
+  &--error {
+    border-left-color: var(--error, #e22134);
+
+    .notificacion__icono {
+      color: var(--error, #e22134);
+    }
+  }
+
+  &--advertencia {
+    border-left-color: var(--warning, #f59e0b);
+
+    .notificacion__icono {
+      color: var(--warning, #f59e0b);
+    }
+  }
+
+  &--info {
+    border-left-color: var(--info, #3b82f6);
+
+    .notificacion__icono {
+      color: var(--info, #3b82f6);
+    }
+  }
+
+  &__icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+
+    fa-icon {
+      font-size: 1.25rem;
+    }
+  }
+
+  &__contenido {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__mensaje {
+    margin: 0;
+    font-size: var(--text-sm, 0.875rem);
+    line-height: 1.5;
+    color: var(--text-primary, #ffffff);
+    word-wrap: break-word;
+  }
+
+  &__cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--text-secondary, #b3b3b3);
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+
+    fa-icon {
+      font-size: 1rem;
+    }
+
+    &:hover {
+      color: var(--text-primary, #ffffff);
+      transform: scale(1.1);
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+

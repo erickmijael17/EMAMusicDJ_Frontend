@@ -1,0 +1,720 @@
+.inicio-container {
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: transparent;
+  min-height: 100vh;
+  color: var(--text-primary);
+
+
+  .greeting {
+    margin-bottom: var(--spacing-xl);
+    animation: fadeInUp 0.5s ease;
+
+    h1 {
+      font-size: var(--text-4xl);
+      font-weight: var(--font-bold);
+      font-family: var(--font-primary);
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(29, 185, 84, 0.2);
+      border-top-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: var(--spacing-md);
+    }
+
+    span {
+      font-size: 16px;
+      color: var(--text-secondary);
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+    text-align: center;
+
+    .empty-icon {
+      font-size: 64px;
+      color: var(--text-tertiary);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .empty-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 var(--spacing-sm) 0;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin: 0 0 var(--spacing-lg) 0;
+      max-width: 400px;
+    }
+
+    .empty-action {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-sm) var(--spacing-lg);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--primary-color);
+      border: none;
+      border-radius: var(--border-radius-full);
+      text-decoration: none;
+      transition: all var(--transition-base);
+
+      &:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+    }
+  }
+
+  // ==========================================
+  // GRID DE PLAYLISTS FAVORITAS
+  // ==========================================
+  .playlists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+    animation: fadeInUp 0.6s ease 0.1s backwards;
+
+    .playlist-card {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      background: var(--glass-bg-strong);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: var(--border-radius-lg);
+      padding: var(--spacing-sm);
+      cursor: pointer;
+      transition: all var(--transition-slow);
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--glass-border);
+      text-decoration: none;
+      box-shadow: var(--shadow-sm);
+
+      &:hover {
+        background: var(--glass-bg-hover);
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        backdrop-filter: var(--glass-blur-strong);
+        -webkit-backdrop-filter: var(--glass-blur-strong);
+
+        &::before {
+          opacity: 1;
+        }
+
+        img {
+          transform: scale(1.05);
+        }
+      }
+
+      &:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      img {
+        width: 80px;
+        height: 80px;
+        min-width: 80px;
+        border-radius: var(--border-radius-sm);
+        object-fit: cover;
+        flex-shrink: 0;
+        box-shadow: var(--shadow-sm);
+        transition: transform var(--transition-base);
+      }
+
+      span {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+        position: relative;
+        z-index: 1;
+      }
+    }
+  }
+
+  // ==========================================
+  // SECCIONES (Hecho para ti, Escuchado recientemente)
+  // ==========================================
+  .section {
+    margin-bottom: 48px;
+    animation: fadeInUp 0.7s ease 0.2s backwards;
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+
+      h2 {
+        font-size: var(--text-3xl);
+        font-weight: var(--font-bold);
+        font-family: var(--font-primary);
+        color: var(--text-primary);
+        margin: 0;
+        letter-spacing: -0.5px;
+      }
+
+      .see-all {
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
+        font-family: var(--font-primary);
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all var(--transition-base);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--border-radius-md);
+        position: relative;
+        overflow: hidden;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background: var(--primary-color);
+          transition: width var(--transition-base);
+        }
+
+        &:hover {
+          color: var(--primary-hover);
+          
+          &::after {
+            width: 100%;
+          }
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+
+    // ==========================================
+    // SCROLL HORIZONTAL DE CARDS
+    // ==========================================
+    .cards-scroll {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 16px;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+
+      // Ocultar scrollbar en webkit
+      &::-webkit-scrollbar {
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+        margin: 0 16px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        transition: background 0.2s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      }
+
+      // ==========================================
+      // MUSIC CARD
+      // ==========================================
+      .music-card {
+        min-width: 180px;
+        max-width: 180px;
+        background: var(--glass-bg-strong);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border-radius: var(--border-radius-xl);
+        padding: var(--spacing-md);
+        cursor: pointer;
+        transition: all var(--transition-slow);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-md);
+
+        &:hover {
+          background: var(--glass-bg-hover);
+          border-color: var(--primary-color);
+          transform: translateY(-8px) scale(1.02);
+          box-shadow: var(--glass-shadow-strong);
+          backdrop-filter: var(--glass-blur-strong);
+          -webkit-backdrop-filter: var(--glass-blur-strong);
+
+          &::before {
+            opacity: 1;
+          }
+
+          .card-image {
+            img {
+              transform: scale(1.05);
+            }
+
+            svg {
+              transform: scale(1.1);
+            }
+
+            &::after {
+              opacity: 1;
+            }
+          }
+        }
+
+        &:active {
+          transform: translateY(-4px) scale(0.98);
+        }
+
+        .card-image {
+          width: 100%;
+          aspect-ratio: 1;
+          border-radius: var(--border-radius-md);
+          background: var(--bg-quaternary);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          position: relative;
+          box-shadow: var(--shadow-md);
+
+          // Play button overlay
+          &::after {
+            content: '▶';
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 48px;
+            height: 48px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 16px;
+            padding-left: 4px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-md);
+          }
+
+          svg {
+            transition: transform 0.3s ease;
+          }
+
+          &.album {
+            background: transparent;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              transition: transform 0.3s ease;
+            }
+          }
+        }
+
+        h3 {
+          font-size: var(--text-base);
+          font-weight: var(--font-semibold);
+          font-family: var(--font-primary);
+          color: var(--text-primary);
+          margin: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          line-height: 1.4;
+        }
+
+        p {
+          font-size: var(--text-sm);
+          font-weight: var(--font-normal);
+          font-family: var(--font-secondary);
+          color: var(--text-secondary);
+          margin: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+}
+
+// ==========================================
+// ANIMATIONS
+// ==========================================
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+// ==========================================
+// RESPONSIVE DESIGN
+// ==========================================
+
+// Large Desktop
+@media (min-width: 1600px) {
+  .inicio-container {
+    .playlists-grid {
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+
+    .section {
+      .cards-scroll {
+        .music-card {
+          min-width: 200px;
+          max-width: 200px;
+        }
+      }
+    }
+  }
+}
+
+// Desktop
+@media (max-width: 1440px) {
+  .inicio-container {
+    .greeting {
+      h1 {
+        font-size: 42px;
+      }
+    }
+
+    .section {
+      .section-header {
+        h2 {
+          font-size: 28px;
+        }
+      }
+    }
+  }
+}
+
+// Tablet
+@media (max-width: 1024px) {
+  .inicio-container {
+    padding: 24px 20px;
+
+    .greeting {
+      margin-bottom: 24px;
+
+      h1 {
+        font-size: 36px;
+      }
+    }
+
+    .playlists-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+
+      .section-header {
+        margin-bottom: 20px;
+
+        h2 {
+          font-size: 24px;
+        }
+      }
+
+      .cards-scroll {
+        gap: 16px;
+
+        .music-card {
+          min-width: 160px;
+          max-width: 160px;
+          padding: 14px;
+        }
+      }
+    }
+  }
+}
+
+// Mobile
+@media (max-width: 768px) {
+  .inicio-container {
+    padding: 20px 16px;
+
+    .greeting {
+      margin-bottom: 20px;
+
+      h1 {
+        font-size: 28px;
+      }
+    }
+
+    .playlists-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 10px;
+      margin-bottom: 32px;
+
+      .playlist-card {
+        padding: 6px;
+        gap: 12px;
+
+        img {
+          width: 64px;
+          height: 64px;
+          min-width: 64px;
+        }
+
+        span {
+          font-size: 14px;
+        }
+      }
+    }
+
+    .section {
+      margin-bottom: 32px;
+
+      .section-header {
+        margin-bottom: 16px;
+
+        h2 {
+          font-size: 22px;
+        }
+
+        .see-all {
+          font-size: 13px;
+        }
+      }
+
+      .cards-scroll {
+        gap: 12px;
+
+        .music-card {
+          min-width: 140px;
+          max-width: 140px;
+          padding: 12px;
+
+          h3 {
+            font-size: 15px;
+          }
+
+          p {
+            font-size: 13px;
+          }
+
+          .card-image {
+            &::after {
+              width: 40px;
+              height: 40px;
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Mobile Small
+@media (max-width: 480px) {
+  .inicio-container {
+    padding: 16px 12px;
+
+    .greeting {
+      h1 {
+        font-size: 24px;
+      }
+    }
+
+    .playlists-grid {
+      grid-template-columns: 1fr;
+
+      .playlist-card {
+        span {
+          font-size: 13px;
+        }
+      }
+    }
+
+    .section {
+      .section-header {
+        h2 {
+          font-size: 20px;
+        }
+      }
+
+      .cards-scroll {
+        .music-card {
+          min-width: 130px;
+          max-width: 130px;
+
+          h3 {
+            font-size: 14px;
+          }
+
+          p {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ==========================================
+// LOADING STATES (opcional)
+// ==========================================
+.music-card.loading {
+  pointer-events: none;
+
+  .card-image,
+  h3,
+  p {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.05) 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+    border-radius: 8px;
+  }
+
+  h3,
+  p {
+    height: 16px;
+  }
+}
+
+// ==========================================
+// MODO CLARO (opcional)
+// ==========================================
+.light-mode {
+  .inicio-container {
+    background: linear-gradient(180deg, rgba(147, 51, 234, 0.1) 0%, #ffffff 300px);
+    color: #000000;
+
+    .greeting {
+      h1 {
+        color: #000000;
+      }
+    }
+
+    .playlists-grid {
+      .playlist-card {
+        background: rgba(0, 0, 0, 0.05);
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.08);
+        }
+
+        span {
+          color: #000000;
+        }
+      }
+    }
+
+    .section {
+      .section-header {
+        h2 {
+          color: #000000;
+        }
+
+        .see-all {
+          color: rgba(0, 0, 0, 0.7);
+
+          &:hover {
+            color: #000000;
+            background: rgba(0, 0, 0, 0.05);
+          }
+        }
+      }
+
+      .cards-scroll {
+        .music-card {
+          background: rgba(0, 0, 0, 0.03);
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.06);
+          }
+
+          h3 {
+            color: #000000;
+          }
+
+          p {
+            color: rgba(0, 0, 0, 0.6);
+          }
+        }
+      }
+    }
+  }
+}
+

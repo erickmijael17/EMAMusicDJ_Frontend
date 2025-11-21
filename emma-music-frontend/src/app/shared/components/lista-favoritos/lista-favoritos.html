@@ -1,0 +1,121 @@
+<div class="favoritos-container">
+
+  <div class="header">
+    <h2>Mis Favoritos</h2>
+    <button class="btn-recargar" (click)="cargarFavoritos()">
+      🔄 Actualizar
+    </button>
+  </div>
+
+  <div class="estadisticas">
+    <div class="stat">
+      <span class="numero">{{ totalFavoritos() }}</span>
+      <span class="label">Total</span>
+    </div>
+    <div class="stat">
+      <span class="numero">{{ totalPistas() }}</span>
+      <span class="label">Descargadas</span>
+    </div>
+    <div class="stat">
+      <span class="numero">{{ totalMetadatos() }}</span>
+      <span class="label">Online</span>
+    </div>
+  </div>
+
+  <div class="filtros">
+    <div class="filtros-tipo">
+      <button
+        [class.activo]="filtroActual() === 'todos'"
+        (click)="cambiarFiltro('todos')">
+        Todos
+      </button>
+      <button
+        [class.activo]="filtroActual() === 'pistas'"
+        (click)="cambiarFiltro('pistas')">
+        Descargadas
+      </button>
+      <button
+        [class.activo]="filtroActual() === 'metadatos'"
+        (click)="cambiarFiltro('metadatos')">
+        Online
+      </button>
+    </div>
+
+    <select
+      class="ordenar"
+      [value]="ordenActual()"
+      (change)="cambiarOrden($event)">
+      <option value="reciente">Más recientes</option>
+      <option value="titulo">Por título</option>
+      <option value="artista">Por artista</option>
+    </select>
+  </div>
+
+  @if (cargando()) {
+    <div class="spinner-container">
+      <div class="spinner-grande"></div>
+      <p>Cargando favoritos...</p>
+    </div>
+  }
+
+  @if (!cargando() && favoritosFiltrados().length === 0) {
+    <div class="sin-favoritos">
+      <p>No tienes favoritos todavía</p>
+      <p class="subtexto">Marca canciones como favoritas para verlas aquí</p>
+    </div>
+  }
+
+  @if (!cargando() && favoritosFiltrados().length > 0) {
+    <div class="lista-favoritos">
+      @for (favorito of favoritosFiltrados(); track favorito.idVideoYoutube) {
+        <div
+          class="favorito-item"
+          [class.descargada]="favorito.estaDescargada">
+
+          <img
+            [src]="favorito.miniaturaUrl"
+            [alt]="favorito.titulo"
+            class="miniatura">
+
+          <div class="info">
+            <h3 class="titulo">
+              {{ favorito.titulo }}
+              @if (favorito.esExplicito) {
+                <span class="explicito">E</span>
+              }
+            </h3>
+            <p class="canal">{{ favorito.canal }}</p>
+            <p class="detalles">
+              <span class="duracion">{{ favorito.duracionTexto }}</span>
+              <span class="separador">•</span>
+              <span
+                class="tipo"
+                [class.pista]="favorito.tipoFavorito === 'PISTA_PRINCIPAL'">
+                {{ favorito.tipoFavorito === 'PISTA_PRINCIPAL' ? '📥 Descargada' : '🌐 Online' }}
+              </span>
+              <span class="separador">•</span>
+              <span class="fecha">{{ formatearFecha(favorito.fechaAdicion) }}</span>
+            </p>
+          </div>
+
+          <div class="acciones">
+            <button
+              class="btn-reproducir"
+              (click)="reproducir(favorito)"
+              title="Reproducir">
+              ▶️
+            </button>
+
+            <button
+              class="btn-eliminar"
+              (click)="eliminarFavorito(favorito)"
+              title="Eliminar de favoritos">
+              🗑️
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+

@@ -1,0 +1,466 @@
+.sidebar {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-secondary, #121212);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  overflow: hidden;
+  transition: all var(--transition-base, 200ms ease);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, var(--primary-color, #1db954), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-base, 200ms ease);
+  }
+
+  &:hover::before {
+    opacity: 0.3;
+  }
+
+  &.collapsed {
+    .logo-text,
+    .nav-item span,
+    .playlists-section,
+    .show-more-btn {
+      display: none;
+    }
+
+    .sidebar-logo {
+      justify-content: center;
+    }
+
+    .nav-item {
+      justify-content: center;
+      padding: var(--space-3, 0.75rem);
+    }
+  }
+}
+
+.sidebar-header {
+  padding: var(--space-4, 1rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2, 0.5rem);
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-2, 0.5rem);
+  border-radius: var(--radius-lg, 8px);
+  cursor: pointer;
+  transition: all var(--transition-base, 200ms ease);
+  flex: 1;
+  min-width: 0;
+
+  &:hover {
+    background: var(--bg-hover, rgba(255, 255, 255, 0.07));
+
+    .logo-icon {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
+    }
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    background: linear-gradient(135deg, var(--primary-color, #1db954) 0%, #1ed760 100%);
+    border-radius: var(--radius-lg, 8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(29, 185, 84, 0.3);
+    transition: all var(--transition-base, 200ms ease);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+      opacity: 0;
+      transition: opacity var(--transition-base, 200ms ease);
+    }
+
+    &:hover::before {
+      opacity: 1;
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+
+    .logo-title {
+      font-size: var(--text-xl, 1.25rem);
+      font-weight: var(--font-bold, 700);
+      color: var(--text-primary, #ffffff);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-subtitle {
+      font-size: var(--text-xs, 0.75rem);
+      font-weight: var(--font-medium, 500);
+      color: var(--text-secondary, #b3b3b3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+  }
+}
+
+.collapse-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary, #181818);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-full, 9999px);
+  color: var(--text-secondary, #b3b3b3);
+  cursor: pointer;
+  transition: all var(--transition-base, 200ms ease);
+  flex-shrink: 0;
+
+  &:hover {
+    background: var(--bg-hover, rgba(255, 255, 255, 0.07));
+    border-color: var(--border-color-strong, rgba(255, 255, 255, 0.2));
+    color: var(--text-primary, #ffffff);
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  fa-icon {
+    font-size: 14px;
+  }
+}
+
+.nav-menu {
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 0.25rem);
+}
+
+.nav-item,
+.nav-item-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 1rem);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  border-radius: var(--radius-lg, 8px);
+  color: var(--text-secondary, #b3b3b3);
+  text-decoration: none;
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  transition: all var(--transition-fast, 150ms ease);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: var(--primary-color, #1db954);
+    transition: width var(--transition-fast, 150ms ease);
+  }
+
+  fa-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: all var(--transition-fast, 150ms ease);
+    position: relative;
+    z-index: 1;
+  }
+
+  span {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &:hover {
+    background: var(--bg-hover, rgba(255, 255, 255, 0.07));
+    color: var(--text-primary, #ffffff);
+
+    &::before {
+      width: 3px;
+    }
+
+    fa-icon {
+      transform: scale(1.1);
+      color: var(--primary-color, #1db954);
+    }
+  }
+
+  &.active {
+    background: var(--bg-active, rgba(255, 255, 255, 0.15));
+    color: var(--text-primary, #ffffff);
+
+    &::before {
+      width: 3px;
+    }
+
+    fa-icon {
+      color: var(--primary-color, #1db954);
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.nav-divider {
+  height: 1px;
+  background: var(--border-color, rgba(255, 255, 255, 0.1));
+  margin: var(--space-3, 0.75rem) var(--space-4, 1rem);
+}
+
+.playlists-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--space-3, 0.75rem);
+  overflow: hidden;
+  min-height: 0;
+
+  .playlists-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3, 0.75rem) var(--space-2, 0.5rem);
+    margin-bottom: var(--space-2, 0.5rem);
+
+    .playlists-title {
+      font-size: var(--text-xs, 0.75rem);
+      font-weight: var(--font-semibold, 600);
+      color: var(--text-secondary, #b3b3b3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .show-more-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm, 4px);
+      color: var(--text-secondary, #b3b3b3);
+      cursor: pointer;
+      transition: all var(--transition-fast, 150ms ease);
+
+      &:hover {
+        background: var(--bg-hover, rgba(255, 255, 255, 0.07));
+        color: var(--text-primary, #ffffff);
+        transform: scale(1.1);
+      }
+
+      fa-icon {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .playlists-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1, 0.25rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: var(--space-2, 0.5rem);
+    margin-right: calc(var(--space-2, 0.5rem) * -1);
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      transition: background var(--transition-base, 200ms ease);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+}
+
+.playlist-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-2, 0.5rem);
+  border-radius: var(--radius-md, 6px);
+  color: var(--text-secondary, #b3b3b3);
+  text-decoration: none;
+  transition: all var(--transition-fast, 150ms ease);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+  }
+
+  &:hover {
+    background: var(--bg-hover, rgba(255, 255, 255, 0.07));
+    color: var(--text-primary, #ffffff);
+
+    &::before {
+      width: 200px;
+      height: 200px;
+    }
+
+    .playlist-icon {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  &.active {
+    background: var(--bg-active, rgba(255, 255, 255, 0.15));
+    color: var(--text-primary, #ffffff);
+
+    .playlist-icon {
+      border-color: var(--primary-color, #1db954);
+    }
+  }
+
+  .playlist-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: var(--radius-md, 6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary, #181818);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    overflow: hidden;
+    transition: all var(--transition-base, 200ms ease);
+    position: relative;
+    z-index: 1;
+
+    .playlist-thumbnail {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    fa-icon {
+      font-size: 18px;
+      color: var(--text-tertiary, #6a6a6a);
+    }
+  }
+
+  .playlist-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1, 0.25rem);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+
+    .playlist-name {
+      font-size: var(--text-sm, 0.875rem);
+      font-weight: var(--font-medium, 500);
+      color: inherit;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .playlist-meta {
+      font-size: var(--text-xs, 0.75rem);
+      color: var(--text-tertiary, #6a6a6a);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.sidebar-footer {
+  padding: var(--space-3, 0.75rem);
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  margin-top: auto;
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    &:not(.collapsed) {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: var(--z-fixed, 1030);
+      box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.5);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: var(--sidebar-width-mobile, 100vw);
+    max-width: 300px;
+  }
+}
+

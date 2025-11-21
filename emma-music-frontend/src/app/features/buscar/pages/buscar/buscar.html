@@ -1,0 +1,114 @@
+<div class="search-container">
+
+  <!-- Estado inicial - Sin búsqueda -->
+  @if (!haBuscado() && !estaCargando()) {
+  <div class="empty-search-state">
+    <fa-icon [icon]="iconos.search" class="empty-icon"></fa-icon>
+    <h2 class="empty-title">Busca tu música favorita</h2>
+    <p class="empty-text">Usa el buscador del header para encontrar canciones, artistas y álbumes</p>
+  </div>
+  }
+
+  <!-- Estado de Carga -->
+  @if (estaCargando()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Buscando música...</p>
+  </div>
+  }
+
+  <!-- Mensaje de Error -->
+  @if (error() && !estaCargando() && haBuscado()) {
+  <div class="error-container">
+    <fa-icon [icon]="iconos.error" class="error-icon"></fa-icon>
+    <p class="error-text">{{ error() }}</p>
+    <button class="retry-button" (click)="realizarBusqueda(consultaBusqueda())" type="button">
+      Reintentar
+    </button>
+  </div>
+  }
+
+  <!-- Resultados de Búsqueda -->
+  @if (!estaCargando() && !error() && pistas().length > 0 && haBuscado()) {
+  <div class="results-container">
+    <div class="results-header">
+      <h2 class="results-title">Resultados</h2>
+      <span class="results-count">{{ pistas().length }} canciones encontradas</span>
+    </div>
+
+    <div class="tracks-grid">
+      @for (cancion of pistas(); track cancion.id_video + '-' + $index) {
+      <div class="track-card" (click)="reproducirPista(cancion, $index)">
+        <!-- Thumbnail -->
+        <div class="track-thumbnail">
+          <img
+            [src]="(cancion.miniaturas && cancion.miniaturas[0]) || (cancion.id_video ? 'https://i.ytimg.com/vi/' + cancion.id_video + '/default.jpg' : '')"
+            [alt]="cancion.titulo" (error)="onErrorImagen($event)" loading="lazy" />
+          <div class="play-overlay">
+            <button class="play-button" type="button">
+              <fa-icon [icon]="iconos.play"></fa-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Información del Track -->
+        <div class="track-info">
+          <h3 class="track-title">
+            {{ cancion.titulo }}
+            @if (cancion.es_explicito) {
+              <span class="explicit-badge" title="Contenido explícito">E</span>
+            }
+          </h3>
+          <p class="track-artists">{{ obtenerNombresArtistas(cancion) }}</p>
+          <div class="track-meta">
+            @if (tieneAlbum(cancion)) {
+              <span class="track-album" [title]="'Álbum: ' + cancion.album!.nombre">{{ cancion.album!.nombre }}</span>
+            } @else if (cancion.categoria) {
+              <span class="track-category">{{ cancion.categoria }}</span>
+            }
+            <span class="track-duration">{{ cancion.duracion }}</span>
+            @if (cancion.vistas) {
+              <span class="track-views">{{ cancion.vistas }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="track-actions">
+          <button class="action-button" type="button" title="Agregar a favoritos">
+            <fa-icon [icon]="iconos.like"></fa-icon>
+          </button>
+          <button class="action-button" type="button" title="Agregar a playlist"
+            (click)="abrirModalPlaylist(cancion, $event)">
+            <fa-icon [icon]="iconos.addToPlaylist"></fa-icon>
+          </button>
+          <button class="action-button" type="button" title="Más opciones">
+            <fa-icon [icon]="iconos.moreVertical"></fa-icon>
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+
+  @if (haBuscado() && !estaCargando() && !error() && pistas().length === 0) {
+  <div class="no-results">
+    <div class="no-results-icon">
+      <fa-icon [icon]="iconos.search" size="3x"></fa-icon>
+    </div>
+    <h3 class="no-results-title">No se encontraron resultados</h3>
+    <p class="no-results-text">
+      No pudimos encontrar "{{ consultaBusqueda() }}". Intenta con otra búsqueda.
+    </p>
+  </div>
+  }
+
+  <!-- Modal de Playlists -->
+  @if (pistaSeleccionada()) {
+  <app-playlist-modal [pistaSeleccionada]="pistaSeleccionada()!" [mostrar]="mostrarModalPlaylist()"
+    (cerrar)="cerrarModalPlaylist()" (cancionAgregada)="onCancionAgregada($event)">
+  </app-playlist-modal>
+  }
+</div>

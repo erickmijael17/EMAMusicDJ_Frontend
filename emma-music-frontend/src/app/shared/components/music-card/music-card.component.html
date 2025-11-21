@@ -1,0 +1,47 @@
+<div class="music-card" (click)="onClick()">
+  <div class="music-card__thumbnail">
+    @if (imagenUrl) {
+      <img
+        [src]="imagenUrl"
+        [alt]="titulo"
+        class="music-card__image"
+        loading="lazy"
+        (error)="onErrorImagen($event)">
+    } @else {
+      <div class="music-card__image-placeholder">
+        <fa-icon [icon]="iconos.music"></fa-icon>
+      </div>
+    }
+
+    @if (mostrarBotonPlay) {
+      <div class="music-card__overlay">
+        <button
+          class="music-card__play-btn"
+          (click)="onReproducir($event)"
+          [attr.aria-label]="'Reproducir ' + titulo">
+          <fa-icon [icon]="isPlaying ? iconos.pause : iconos.play"></fa-icon>
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="music-card__content">
+    <h3 class="music-card__titulo" [title]="titulo">{{ titulo }}</h3>
+    @if (subtitulo) {
+      <p class="music-card__subtitulo" [title]="subtitulo">{{ subtitulo }}</p>
+    }
+    @if (duracion) {
+      <span class="music-card__duracion">{{ duracion }}</span>
+    }
+  </div>
+
+  @if (mostrarBotonOpciones) {
+    <button
+      class="music-card__opciones-btn"
+      (click)="onOpciones($event)"
+      [attr.aria-label]="'Opciones para ' + titulo">
+      <fa-icon [icon]="iconos.moreVertical"></fa-icon>
+    </button>
+  }
+</div>
+

@@ -1,0 +1,154 @@
+<div class="biblioteca-container">
+  <div class="biblioteca-header">
+    <h1 class="page-title">Tu Biblioteca</h1>
+    <p class="page-subtitle">Tus canciones favoritas, playlists y más</p>
+  </div>
+
+  @if (error()) {
+    <div class="biblioteca-error">
+      <fa-icon [icon]="iconos.error"></fa-icon>
+      <span>{{ error() }}</span>
+      <button class="error-close" (click)="limpiarError()" type="button">
+        <fa-icon [icon]="iconos.close"></fa-icon>
+      </button>
+    </div>
+  }
+
+  @if (estaCargando()) {
+    <div class="biblioteca-loading">
+      <div class="loading-spinner"></div>
+      <span>Cargando tu biblioteca...</span>
+    </div>
+  }
+
+  @if (!estaCargando() && !error()) {
+    <div class="biblioteca-stats">
+      <div class="stat-card">
+        <fa-icon [icon]="iconos.like" class="stat-icon"></fa-icon>
+        <div class="stat-content">
+          <div class="stat-value">{{ estadisticas().totalFavoritas }}</div>
+          <div class="stat-label">Canciones favoritas</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <fa-icon [icon]="iconos.playlist" class="stat-icon"></fa-icon>
+        <div class="stat-content">
+          <div class="stat-value">{{ estadisticas().totalPlaylists }}</div>
+          <div class="stat-label">Playlists</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <fa-icon [icon]="iconos.clock" class="stat-icon"></fa-icon>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatearDuracionTotal(estadisticas().totalDuracion) }}</div>
+          <div class="stat-label">Tiempo total</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="biblioteca-sections">
+      <section class="biblioteca-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <fa-icon [icon]="iconos.like"></fa-icon>
+            Canciones que te gustan
+          </h2>
+          <span class="section-count">{{ cancionesFavoritas().length }} canciones</span>
+        </div>
+
+        @if (cancionesFavoritas().length > 0) {
+          <div class="tracks-grid">
+            @for (favorito of cancionesFavoritas(); track favorito.idVideoYoutube) {
+              <div class="track-card" (click)="reproducirFavorita(favorito)">
+                <div class="track-thumbnail">
+                  <img
+                    [src]="favorito.miniaturaUrl || (favorito.idVideoYoutube ? 'https://i.ytimg.com/vi/' + favorito.idVideoYoutube + '/default.jpg' : '')"
+                    [alt]="favorito.titulo"
+                    (error)="onErrorImagen($event)"
+                    loading="lazy"
+                  />
+                  <div class="play-overlay">
+                    <button class="play-button" type="button">
+                      <fa-icon [icon]="iconos.play"></fa-icon>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="track-info">
+                  <h3 class="track-title">{{ favorito.titulo }}</h3>
+                  <p class="track-artists">{{ favorito.canal || 'Sin información' }}</p>
+                  <span class="track-duration">{{ favorito.duracionTexto || formatearDuracion(favorito.duracionSegundos || 0) }}</span>
+                  @if (favorito.estaDescargada) {
+                    <span class="track-badge">Descargada</span>
+                  } @else {
+                    <span class="track-badge track-badge--online">En línea</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <fa-icon [icon]="iconos.like" class="empty-icon"></fa-icon>
+            <h3 class="empty-title">No tienes canciones favoritas aún</h3>
+            <p class="empty-text">Explora música y marca tus canciones favoritas para encontrarlas aquí</p>
+            <a [routerLink]="['/buscar']" class="empty-action">
+              <fa-icon [icon]="iconos.search"></fa-icon>
+              <span>Buscar música</span>
+            </a>
+          </div>
+        }
+      </section>
+
+      <section class="biblioteca-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <fa-icon [icon]="iconos.playlist"></fa-icon>
+            Tus Playlists
+          </h2>
+          <a [routerLink]="['/playlists']" class="section-link">Ver todas</a>
+        </div>
+
+        @if (playlists().length > 0) {
+          <div class="playlists-grid">
+            @for (playlist of playlists().slice(0, 6); track playlist.listaId) {
+              <a [routerLink]="['/playlists', playlist.listaId]" class="playlist-card">
+                <div class="playlist-thumbnail">
+                  @if (playlist.urlImagenPortada) {
+                    <img
+                      [src]="playlist.urlImagenPortada"
+                      [alt]="playlist.titulo"
+                      (error)="onErrorImagen($event)"
+                    />
+                  } @else {
+                    <div class="playlist-placeholder">
+                      <fa-icon [icon]="iconos.music"></fa-icon>
+                    </div>
+                  }
+                </div>
+
+                <div class="playlist-info">
+                  <h3 class="playlist-title">{{ playlist.titulo }}</h3>
+                  <p class="playlist-meta">{{ playlist.totalCanciones }} canciones</p>
+                </div>
+              </a>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <fa-icon [icon]="iconos.playlist" class="empty-icon"></fa-icon>
+            <h3 class="empty-title">No tienes playlists aún</h3>
+            <p class="empty-text">Crea tu primera playlist para organizar tu música</p>
+            <a [routerLink]="['/playlists']" class="empty-action">
+              <fa-icon [icon]="iconos.add"></fa-icon>
+              <span>Crear playlist</span>
+            </a>
+          </div>
+        }
+      </section>
+    </div>
+  }
+</div>
+

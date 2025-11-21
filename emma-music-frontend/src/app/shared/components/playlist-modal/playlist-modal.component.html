@@ -1,0 +1,190 @@
+@if (mostrar()) {
+  <div class="playlist-modal-overlay" (click)="onOverlayClick()">
+    <div class="playlist-modal" (click)="onModalClick($event)">
+      <div class="playlist-modal__header">
+        <h3 class="playlist-modal__title">Agregar a playlist</h3>
+        <button
+          class="playlist-modal__close"
+          (click)="onCerrar()"
+          type="button"
+          aria-label="Cerrar modal">
+          <fa-icon [icon]="iconos.close"></fa-icon>
+        </button>
+      </div>
+
+      @if (pistaSeleccionada()) {
+        <div class="playlist-modal__track">
+          @if (pistaSeleccionada()!.miniaturas && pistaSeleccionada()!.miniaturas!.length > 0) {
+            <img
+              [src]="pistaSeleccionada()!.miniaturas![0]"
+              [alt]="pistaSeleccionada()!.titulo"
+              class="playlist-modal__track-thumbnail"
+              (error)="$event.target.style.display = 'none'">
+          } @else {
+            <div class="playlist-modal__track-thumbnail playlist-modal__track-thumbnail--placeholder">
+              <fa-icon [icon]="iconos.music"></fa-icon>
+            </div>
+          }
+          <div class="playlist-modal__track-info">
+            <h4 class="playlist-modal__track-title">{{ pistaSeleccionada()!.titulo }}</h4>
+            <p class="playlist-modal__track-artists">
+              {{ pistaSeleccionada()!.artistas && pistaSeleccionada()!.artistas!.length > 0
+                ? pistaSeleccionada()!.artistas![0].nombre
+                : (pistaSeleccionada()!.canal || 'Artista desconocido') }}
+            </p>
+          </div>
+        </div>
+      }
+
+      <div class="playlist-modal__actions">
+        <div class="playlist-modal__search">
+          <fa-icon [icon]="iconos.search" class="playlist-modal__search-icon"></fa-icon>
+          <input
+            type="text"
+            class="playlist-modal__search-input"
+            placeholder="Buscar playlist..."
+            [value]="terminoBusqueda()"
+            (input)="onBusquedaInput($event)"
+            autocomplete="off">
+          @if (terminoBusqueda()) {
+            <button
+              class="playlist-modal__search-clear"
+              (click)="limpiarBusqueda()"
+              type="button"
+              aria-label="Limpiar búsqueda">
+              <fa-icon [icon]="iconos.close"></fa-icon>
+            </button>
+          }
+        </div>
+
+        <button
+          class="playlist-modal__new-btn"
+          (click)="toggleFormCrear()"
+          type="button"
+          [class.active]="mostrarFormCrear()">
+          <fa-icon [icon]="mostrarFormCrear() ? iconos.close : iconos.add"></fa-icon>
+          <span>{{ mostrarFormCrear() ? 'Cancelar' : 'Nueva Playlist' }}</span>
+        </button>
+      </div>
+
+      @if (mostrarFormCrear()) {
+        <form class="playlist-modal__create-form" (submit)="onCrearPlaylist($event)">
+          <div class="create-form__field">
+            <input
+              type="text"
+              class="create-form__input"
+              placeholder="Nombre de la playlist"
+              [value]="tituloNuevaPlaylist()"
+              (input)="onTituloInput($event)"
+              [disabled]="creandoPlaylist()"
+              autocomplete="off"
+              required>
+          </div>
+          <button
+            type="submit"
+            class="create-form__submit"
+            [disabled]="!tituloNuevaPlaylist().trim() || creandoPlaylist()">
+            @if (creandoPlaylist()) {
+              <span class="spinner-small"></span>
+              <span>Creando...</span>
+            } @else {
+              <fa-icon [icon]="iconos.check"></fa-icon>
+              <span>Crear y Agregar</span>
+            }
+          </button>
+        </form>
+      }
+
+      <div class="playlist-modal__content">
+        @if (estaCargando()) {
+          <div class="playlist-modal__loading">
+            <div class="spinner"></div>
+            <p>Cargando playlists...</p>
+          </div>
+        } @else if (playlistsFiltradas().length > 0) {
+          <div class="playlist-modal__list">
+            @for (playlist of playlistsFiltradas(); track playlist.listaId) {
+              <button
+                class="playlist-modal__item"
+                [class.loading]="estaEnProceso(playlist.listaId)"
+                [class.success]="tieneExito(playlist.listaId)"
+                [class.already-added]="yaAgregada(playlist.listaId) && !tieneExito(playlist.listaId)"
+                [disabled]="estaEnProceso(playlist.listaId)"
+                (click)="onAgregarAPlaylist(playlist, $event)"
+                type="button">
+                <div class="playlist-modal__item-thumbnail">
+                  @if (playlist.urlImagenPortada) {
+                    <img
+                      [src]="playlist.urlImagenPortada"
+                      [alt]="playlist.titulo"
+                      loading="lazy"
+                      (error)="$event.target.style.display = 'none'">
+                  } @else {
+                    <div class="playlist-modal__item-placeholder">
+                      <fa-icon [icon]="iconos.playlist"></fa-icon>
+                    </div>
+                  }
+                  @if (yaAgregada(playlist.listaId)) {
+                    <div class="playlist-modal__item-badge">
+                      <fa-icon [icon]="iconos.check"></fa-icon>
+                    </div>
+                  }
+                </div>
+                <div class="playlist-modal__item-info">
+                  <h4 class="playlist-modal__item-title">
+                    {{ playlist.titulo }}
+                    @if (yaAgregada(playlist.listaId) && !tieneExito(playlist.listaId)) {
+                      <span class="playlist-modal__item-label">Ya agregada</span>
+                    }
+                  </h4>
+                  <p class="playlist-modal__item-count">
+                    {{ playlist.totalCanciones }} {{ playlist.totalCanciones === 1 ? 'canción' : 'canciones' }}
+                  </p>
+                </div>
+                <div class="playlist-modal__item-status">
+                  @if (estaEnProceso(playlist.listaId)) {
+                    <span class="spinner-small"></span>
+                  } @else if (tieneExito(playlist.listaId)) {
+                    <div class="check-icon-wrapper">
+                      <fa-icon [icon]="iconos.check" class="check-icon"></fa-icon>
+                    </div>
+                  } @else if (yaAgregada(playlist.listaId)) {
+                    <fa-icon [icon]="iconos.check" class="already-icon"></fa-icon>
+                  } @else {
+                    <fa-icon [icon]="iconos.add" class="add-icon"></fa-icon>
+                  }
+                </div>
+              </button>
+            }
+          </div>
+        } @else if (terminoBusqueda()) {
+          <div class="playlist-modal__empty">
+            <fa-icon [icon]="iconos.search" class="playlist-modal__empty-icon"></fa-icon>
+            <h4 class="playlist-modal__empty-title">No se encontraron playlists</h4>
+            <p class="playlist-modal__empty-text">No hay playlists que coincidan con "{{ terminoBusqueda() }}"</p>
+            <button
+              class="playlist-modal__empty-btn"
+              (click)="limpiarBusqueda()">
+              Limpiar búsqueda
+            </button>
+          </div>
+        } @else {
+          <div class="playlist-modal__empty">
+            <fa-icon [icon]="iconos.playlist" class="playlist-modal__empty-icon"></fa-icon>
+            <h4 class="playlist-modal__empty-title">No tienes playlists</h4>
+            <p class="playlist-modal__empty-text">Crea tu primera playlist para agregar canciones</p>
+            <button
+              class="playlist-modal__empty-btn"
+              (click)="toggleFormCrear()">
+              <fa-icon [icon]="iconos.add"></fa-icon>
+              <span>Crear playlist</span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+
+

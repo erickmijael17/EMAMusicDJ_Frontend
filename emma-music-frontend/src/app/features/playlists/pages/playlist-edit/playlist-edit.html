@@ -1,0 +1,150 @@
+<div class="playlist-edit">
+  @if (error()) {
+    <div class="playlist-edit__error">
+      <fa-icon [icon]="iconos.error"></fa-icon>
+      <span>{{ error() }}</span>
+      <button class="playlist-edit__error-close" (click)="clearError()">
+        <fa-icon [icon]="iconos.close"></fa-icon>
+      </button>
+    </div>
+  }
+
+  @if (estaCargando() && !playlist()) {
+    <div class="playlist-edit__loading">
+      <div class="loading-spinner"></div>
+      <span>Cargando playlist...</span>
+    </div>
+  }
+
+  @if (playlist()) {
+    <div class="playlist-edit__content">
+      <div class="playlist-edit__header">
+        <button class="playlist-edit__back" (click)="cancelarEdicion()">
+          <fa-icon [icon]="iconos.library"></fa-icon>
+          <span>{{ playlist()!.titulo }}</span>
+        </button>
+
+        <h1 class="playlist-edit__title">Editar Playlist</h1>
+
+        <div class="playlist-edit__meta">
+          <span>Creada: {{ formatearFechaCreacion(playlist()!.fechaCreacion) }}</span>
+          <span>•</span>
+          <span>{{ playlist()!.totalCanciones }} {{ playlist()!.totalCanciones === 1 ? 'canción' : 'canciones' }}</span>
+        </div>
+      </div>
+
+      <div class="playlist-edit__form-container">
+        <form (ngSubmit)="guardarPlaylist()" class="edit-form">
+          <div class="edit-form__preview">
+            @if (playlist()!.urlImagenPortada) {
+              <img
+                [src]="playlist()!.urlImagenPortada"
+                [alt]="'Portada de ' + playlist()!.titulo"
+                class="edit-form__image">
+            } @else {
+              <div class="edit-form__image-placeholder">
+                <fa-icon [icon]="iconos.playlist"></fa-icon>
+              </div>
+            }
+          </div>
+
+          <div class="edit-form__fields">
+            <div class="edit-form__field">
+              <label for="titulo" class="edit-form__label">Título de la playlist*</label>
+              <input
+                type="text"
+                id="titulo"
+                class="edit-form__input"
+                [value]="formularioEdicion().titulo"
+                (input)="onInputTitulo($event)"
+                placeholder="Nombre de la playlist"
+                maxlength="100"
+                required>
+            </div>
+
+            <div class="edit-form__field">
+              <label for="descripcion" class="edit-form__label">Descripción</label>
+              <textarea
+                id="descripcion"
+                class="edit-form__textarea"
+                [value]="formularioEdicion().descripcion || ''"
+                (input)="onInputDescripcion($event)"
+                placeholder="Describe tu playlist (opcional)"
+                maxlength="255"
+                rows="4"></textarea>
+            </div>
+
+            <div class="edit-form__field">
+              <label for="urlImagenPortada" class="edit-form__label">URL de la Portada</label>
+              <input
+                type="url"
+                id="urlImagenPortada"
+                class="edit-form__input"
+                [value]="formularioEdicion().urlImagenPortada || ''"
+                (input)="onInputUrlImagen($event)"
+                placeholder="https://ejemplo.com/portada.jpg">
+            </div>
+
+            <div class="edit-form__field">
+              <label class="edit-form__checkbox-label">
+                <input
+                  type="checkbox"
+                  class="edit-form__checkbox"
+                  [checked]="formularioEdicion().esPublica"
+                  (change)="onChangeEsPublica($event)">
+                <span class="edit-form__checkbox-text">
+                  <strong>Hacer pública esta playlist</strong>
+                  <small>Otros usuarios podrán ver y reproducir tu playlist</small>
+                </span>
+              </label>
+            </div>
+
+            <div class="edit-form__field">
+              <label class="edit-form__checkbox-label">
+                <input
+                  type="checkbox"
+                  class="edit-form__checkbox"
+                  [checked]="formularioEdicion().esColaborativa"
+                  (change)="onChangeEsColaborativa($event)">
+                <span class="edit-form__checkbox-text">
+                  <strong>Modo colaborativo</strong>
+                  <small>Permite que otros usuarios agreguen canciones</small>
+                </span>
+              </label>
+            </div>
+
+            <div class="edit-form__quick-actions">
+              <h3>Acciones Rápidas</h3>
+              <button type="button" class="edit-form__quick-btn" (click)="cambiarVisibilidadRapida()">
+                <fa-icon [icon]="iconos.search"></fa-icon>
+                <span>{{ playlist()!.esPublica ? 'Hacer Privada' : 'Hacer Pública' }}</span>
+              </button>
+              <button type="button" class="edit-form__quick-btn" (click)="cambiarModoColaborativoRapido()">
+                <fa-icon [icon]="iconos.community"></fa-icon>
+                <span>{{ playlist()!.esColaborativa ? 'Desactivar Colaboración' : 'Activar Colaboración' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="edit-form__actions">
+            <button
+              type="button"
+              class="edit-form__cancel"
+              (click)="cancelarEdicion()"
+              [disabled]="estaGuardando()">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="edit-form__submit"
+              [disabled]="!formularioEdicion().titulo?.trim() || estaGuardando()">
+              <fa-icon [icon]="iconos.check"></fa-icon>
+              <span>{{ estaGuardando() ? 'Guardando...' : 'Guardar Cambios' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>
+

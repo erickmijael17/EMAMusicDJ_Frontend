@@ -1,0 +1,109 @@
+@if (tienePistaActual()) {
+  <div class="player-controls-container">
+    <div class="track-info">
+      <div class="album-art-wrapper">
+        <img
+          [src]="miniaturaUrl()"
+          [alt]="nombrePista()"
+          class="album-art"
+          crossorigin="anonymous"
+          (error)="onImagenError($event)"
+          loading="lazy">
+      </div>
+      <div class="track-details">
+        <span class="track-title" [title]="nombrePista()">{{ nombrePista() }}</span>
+        <span class="track-artist" [title]="nombreArtista()">{{ nombreArtista() }}</span>
+      </div>
+      <button
+        class="like-button"
+        [class.liked]="esFavorita()"
+        (click)="toggleFavorita()"
+        [attr.aria-label]="esFavorita() ? 'Quitar de favoritos' : 'Agregar a favoritos'">
+        <fa-icon [icon]="esFavorita() ? iconos.like : iconos.likeOutline"></fa-icon>
+      </button>
+    </div>
+
+    <div class="player-main">
+      <div class="controls">
+        <button
+          class="control-btn secondary"
+          [class.active]="modoReproduccion() === 'ALEATORIO'"
+          (click)="toggleShuffle()"
+          [attr.aria-label]="'Activar modo aleatorio'">
+          <fa-icon [icon]="iconos.shuffle"></fa-icon>
+        </button>
+
+        <button
+          class="control-btn secondary"
+          [disabled]="!tieneAnterior()"
+          (click)="onAnterior()"
+          [attr.aria-label]="'Canción anterior'">
+          <fa-icon [icon]="iconos.previous"></fa-icon>
+        </button>
+
+        <button
+          class="control-btn play"
+          (click)="onAlternarReproduccionPausa()"
+          [attr.aria-label]="estadoReproductor()?.estaReproduciendo ? 'Pausar' : 'Reproducir'">
+          <fa-icon [icon]="iconoReproduccion()"></fa-icon>
+        </button>
+
+        <button
+          class="control-btn secondary"
+          [disabled]="!tieneSiguiente()"
+          (click)="onSiguiente()"
+          [attr.aria-label]="'Siguiente canción'">
+          <fa-icon [icon]="iconos.next"></fa-icon>
+        </button>
+
+        <button
+          class="control-btn secondary"
+          [class.active]="modoReproduccionActivo()"
+          [class.repeat-one]="esRepetirUna()"
+          (click)="toggleModoReproduccion()"
+          [attr.aria-label]="'Modo repetir'">
+          <fa-icon [icon]="iconoModoReproduccion()"></fa-icon>
+          @if (esRepetirUna()) {
+            <span class="repeat-indicator">1</span>
+          }
+        </button>
+      </div>
+
+      <div class="progress-bar-wrapper">
+        <span class="time">{{ tiempoActual() }}</span>
+        <div class="progress-container">
+          <input
+            type="range"
+            class="progress-bar"
+            min="0"
+            max="100"
+            [value]="progreso()"
+            (input)="onBuscar($event)"
+            [attr.aria-label]="'Barra de progreso'">
+          <div class="progress-filled" [style.width.%]="progreso()"></div>
+        </div>
+        <span class="time">{{ duracion() }}</span>
+      </div>
+    </div>
+
+    <div class="volume-controls">
+      <button
+        class="volume-btn"
+        (click)="toggleMute()"
+        [attr.aria-label]="estaMuteado() ? 'Activar sonido' : 'Silenciar'">
+        <fa-icon [icon]="iconoVolumen()"></fa-icon>
+      </button>
+      <div class="volume-slider-wrapper">
+        <input
+          type="range"
+          class="volume-slider"
+          min="0"
+          max="100"
+          [value]="estaMuteado() ? 0 : volumen()"
+          (input)="onCambiarVolumen($event)"
+          [attr.aria-label]="'Control de volumen'">
+        <div class="volume-filled" [style.width.%]="estaMuteado() ? 0 : volumen()"></div>
+      </div>
+    </div>
+  </div>
+}

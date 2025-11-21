@@ -1,0 +1,90 @@
+<div class="login-container">
+  <div class="music-note note-1">♪</div>
+  <div class="music-note note-2">♫</div>
+  <div class="music-note note-3">♪</div>
+  <div class="music-note note-4">♫</div>
+  <div class="music-note note-5">♪</div>
+  <div class="music-note note-6">♫</div>
+
+  <div class="login-card">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M16 2L20 10L28 12L22 18L24 26L16 22L8 26L10 18L4 12L12 10L16 2Z" fill="white"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <div class="logo-title">Emma</div>
+        <div class="logo-subtitle">by WD</div>
+      </div>
+    </div>
+
+    <div class="header">
+      <h1>¡Bienvenido de nuevo!</h1>
+      <p>Inicia sesión para continuar tu experiencia musical</p>
+    </div>
+
+    @if (errorLogin()) {
+      <div class="login-error-message">
+        {{ errorLogin() }}
+      </div>
+    }
+
+    <form class="login-form" [formGroup]="formLogin" (ngSubmit)="onSubmit()">
+      <div class="form-group" [ngClass]="{'has-error': formLogin.get('email')?.invalid && formLogin.get('email')?.touched}">
+        <label for="email">Correo electrónico</label>
+        <div class="input-wrapper">
+          <fa-icon [icon]="iconos.email" class="input-icon"></fa-icon>
+          <input
+            type="email"
+            id="email"
+            placeholder="tu@email.com"
+            autocomplete="email"
+            formControlName="email"
+          />
+        </div>
+        @if (formLogin.get('email')?.hasError('required') && formLogin.get('email')?.touched) {
+          <div class="error-message">El correo es requerido.</div>
+        }
+        @if (formLogin.get('email')?.hasError('email') && formLogin.get('email')?.touched) {
+          <div class="error-message">El formato del correo no es válido.</div>
+        }
+      </div>
+
+      <div class="form-group" [ngClass]="{'has-error': formLogin.get('contrasena')?.invalid && formLogin.get('contrasena')?.touched}">
+        <label for="contrasena">Contraseña</label>
+        <div class="input-wrapper">
+          <fa-icon [icon]="iconos.lock" class="input-icon"></fa-icon>
+          <input
+            [type]="passwordVisible() ? 'text' : 'contrasena'"
+            id="contrasena"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            formControlName="contrasena"
+          />
+          <button type="button" class="toggle-password" aria-label="Mostrar u ocultar contraseña" (click)="alternarVisibilidadPassword()">
+            <fa-icon [icon]="passwordVisible() ? iconos.eyeSlash : iconos.eye"></fa-icon>
+          </button>
+        </div>
+        @if (formLogin.get('contrasena')?.hasError('required') && formLogin.get('contrasena')?.touched) {
+          <div class="error-message">La contraseña es requerida.</div>
+        }
+      </div>
+
+      <div class="form-options">
+<!--        <label class="checkbox-wrapper">-->
+<!--          <input type="checkbox" id="remember" />-->
+<!--          <span class="checkbox-label">Recordarme</span>-->
+<!--        </label>-->
+        <a routerLink="/auth/forgot-password" class="forgot-password">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <button type="submit" class="btn-login">Iniciar Sesion</button>
+    </form>
+
+    <div class="register-link">
+      <span>¿No tienes una cuenta? </span>
+      <a routerLink="/auth/register">Regístrate</a>
+    </div>
+  </div>
+</div>

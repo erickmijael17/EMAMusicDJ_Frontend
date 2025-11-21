@@ -1,0 +1,240 @@
+<div class="playlist-detail">
+  @if (error()) {
+    <div class="playlist-detail__error">
+      <fa-icon [icon]="icons.error"></fa-icon>
+      <span>{{ error() }}</span>
+      <button class="playlist-detail__error-close" (click)="clearError()">
+        <fa-icon [icon]="icons.close"></fa-icon>
+      </button>
+    </div>
+  }
+
+  @if (isLoading() && !playlist()) {
+    <div class="playlist-detail__loading">
+      <div class="loading-spinner"></div>
+      <span>Cargando playlist...</span>
+    </div>
+  }
+
+  @if (playlist()) {
+    <div class="playlist-detail__content">
+      <div class="playlist-header">
+        <div class="playlist-header__nav">
+          <button class="playlist-header__back" [routerLink]="['/playlists']">
+            <fa-icon [icon]="icons.library"></fa-icon>
+            <span>Mis Playlists</span>
+          </button>
+        </div>
+
+        <div class="playlist-header__info">
+          <div class="playlist-header__artwork">
+            @if (playlist()!.urlImagenPortada) {
+              <img
+                [src]="playlist()!.urlImagenPortada"
+                [alt]="'Portada de ' + playlist()!.titulo"
+                class="playlist-header__image">
+            } @else {
+              <div class="playlist-header__image-placeholder">
+                <fa-icon [icon]="icons.playlist"></fa-icon>
+              </div>
+            }
+          </div>
+
+          <div class="playlist-header__details">
+            <span class="playlist-header__type">Playlist</span>
+            <h1 class="playlist-header__title">{{ playlist()!.titulo }}</h1>
+
+            @if (playlist()!.descripcion) {
+              <p class="playlist-header__description">{{ playlist()!.descripcion }}</p>
+            }
+
+            <div class="playlist-header__meta">
+              <div class="playlist-header__meta-item">
+                <fa-icon [icon]="icons.profile"></fa-icon>
+                <span>{{ playlist()!.nombreUsuario }}</span>
+              </div>
+              @if (playlist()!.totalCanciones > 0) {
+                <span class="playlist-header__separator">•</span>
+                <span>{{ playlist()!.totalCanciones }} {{ playlist()!.totalCanciones === 1 ? 'canción' : 'canciones' }}</span>
+              }
+              @if (playlist()!.esPublica) {
+                <span class="playlist-header__separator">•</span>
+                <span class="playlist-header__public-badge">Pública</span>
+              }
+              @if (playlist()!.esColaborativa) {
+                <span class="playlist-header__separator">•</span>
+                <span class="playlist-header__collab-badge">Colaborativa</span>
+              }
+            </div>
+
+            <div class="playlist-header__dates">
+              <span>Creada: {{ formatearFechaCreacion(playlist()!.fechaCreacion) }}</span>
+              @if (playlist()!.fechaCreacion !== playlist()!.fechaActualizacion) {
+                <span> • Actualizada: {{ formatearFechaActualizacion(playlist()!.fechaActualizacion) }}</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="playlist-header__actions">
+          <button
+            class="playlist-action-btn playlist-action-btn--play"
+            (click)="reproducirPlaylist()"
+            [disabled]="canciones().length === 0">
+            <fa-icon [icon]="icons.play"></fa-icon>
+            <span>Reproducir</span>
+          </button>
+
+          @if (esPropietario()) {
+            <button class="playlist-action-btn" (click)="toggleSearchForm()">
+              <fa-icon [icon]="icons.add"></fa-icon>
+              <span>Agregar Canción</span>
+            </button>
+            <button class="playlist-action-btn" (click)="cambiarVisibilidad()">
+              <fa-icon [icon]="icons.search"></fa-icon>
+              <span>{{ playlist()!.esPublica ? 'Hacer Privada' : 'Hacer Pública' }}</span>
+            </button>
+            <button class="playlist-action-btn" (click)="cambiarModoColaborativo()">
+              <fa-icon [icon]="icons.community"></fa-icon>
+              <span>{{ playlist()!.esColaborativa ? 'Desactivar Colaboración' : 'Activar Colaboración' }}</span>
+            </button>
+            <button class="playlist-action-btn" (click)="migrarCancionesTemporales()">
+              <fa-icon [icon]="icons.check"></fa-icon>
+              <span>Migrar Temporales</span>
+            </button>
+            <button class="playlist-action-btn playlist-action-btn--primary" [routerLink]="['/playlists', playlist()!.listaId, 'edit']">
+              <fa-icon [icon]="icons.edit"></fa-icon>
+              <span>Editar</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (showSearchForm()) {
+        <div class="search-songs">
+          <h3>Buscar Canciones</h3>
+          <form (submit)="onBuscarSubmit($event)" class="search-songs__form">
+            <input
+              type="text"
+              class="search-songs__input"
+              [value]="terminoBusqueda()"
+              (input)="onTerminoBusquedaInput($event)"
+              placeholder="Buscar por título, artista...">
+            <button type="submit" class="search-songs__btn">
+              <fa-icon [icon]="icons.search"></fa-icon>
+            </button>
+          </form>
+
+          @if (resultadosBusqueda().length > 0) {
+            <div class="search-songs__results">
+              @for (cancion of resultadosBusqueda(); track cancion.idVideoYoutube) {
+                <div
+                  class="song-result"
+                  [class.song-result--loading]="cancionEstaEnProceso(cancion.idVideoYoutube)"
+                  [class.song-result--added]="cancionFueAgregada(cancion.idVideoYoutube)">
+                  <button
+                    class="song-result__play-btn"
+                    (click)="reproducirCancionDesdeBusqueda(cancion)"
+                    title="Reproducir">
+                    <fa-icon [icon]="icons.play"></fa-icon>
+                  </button>
+                  <div class="song-result__info">
+                    <fa-icon [icon]="icons.music" class="song-result__icon"></fa-icon>
+                    <div class="song-result__text">
+                      <span class="song-result__title">{{ cancion.titulo }}</span>
+                      <span class="song-result__artist">{{ cancion.canal }}</span>
+                    </div>
+                    <span class="song-result__badge">En línea</span>
+                    <span class="song-result__duration">{{ cancion.duracionTexto }}</span>
+                  </div>
+                  <button
+                    class="song-result__favorite"
+                    (click)="alternarFavorito(cancion, $event)"
+                    [class.song-result__favorite--active]="esFavorito(cancion.idVideoYoutube)"
+                    [title]="esFavorito(cancion.idVideoYoutube) ? 'Eliminar de favoritos' : 'Agregar a favoritos'">
+                    <fa-icon [icon]="esFavorito(cancion.idVideoYoutube) ? icons.like : icons.likeOutline"></fa-icon>
+                  </button>
+                  <button
+                    class="song-result__add"
+                    (click)="agregarCancionDesdeResultado(cancion)"
+                    [disabled]="cancionEstaEnProceso(cancion.idVideoYoutube) || cancionFueAgregada(cancion.idVideoYoutube)"
+                    [title]="cancionFueAgregada(cancion.idVideoYoutube) ? 'Ya agregada' : 'Agregar a playlist'">
+                    @if (cancionEstaEnProceso(cancion.idVideoYoutube)) {
+                      <span class="spinner-mini"></span>
+                    } @else if (cancionFueAgregada(cancion.idVideoYoutube)) {
+                      <fa-icon [icon]="icons.check"></fa-icon>
+                    } @else {
+                      <fa-icon [icon]="icons.add"></fa-icon>
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <div class="playlist-tracks">
+        @if (canciones().length === 0) {
+          <div class="playlist-tracks__empty">
+            <fa-icon [icon]="icons.music" class="playlist-tracks__empty-icon"></fa-icon>
+            <h3>No hay canciones</h3>
+            <p>Agrega canciones para comenzar a escuchar</p>
+            @if (esPropietario()) {
+              <button class="playlist-tracks__empty-btn" (click)="toggleSearchForm()">
+                <fa-icon [icon]="icons.add"></fa-icon>
+                <span>Agregar Canción</span>
+              </button>
+            }
+          </div>
+        } @else {
+          <div class="playlist-tracks__header">
+            <span class="playlist-tracks__col playlist-tracks__col--number">#</span>
+            <span class="playlist-tracks__col playlist-tracks__col--title">Título</span>
+            <span class="playlist-tracks__col playlist-tracks__col--type">Tipo</span>
+            <span class="playlist-tracks__col playlist-tracks__col--duration">Duración</span>
+            <span class="playlist-tracks__col playlist-tracks__col--actions"></span>
+          </div>
+
+          <div class="playlist-tracks__list">
+            @for (cancion of canciones(); track cancion.idVideoYoutube; let i = $index) {
+              <div class="track-item" (click)="reproducirCancion(cancion, i)">
+                <div class="track-item__number-wrapper">
+                  <span class="track-item__number">{{ i + 1 }}</span>
+                  <fa-icon [icon]="icons.play" class="track-item__play-icon"></fa-icon>
+                </div>
+                <div class="track-item__info">
+                  <span class="track-item__title">{{ cancion.titulo }}</span>
+                  <span class="track-item__artist">{{ cancion.canal }}</span>
+                </div>
+                <div class="track-item__type">
+                  <fa-icon [icon]="icons.music"></fa-icon>
+                  <span>En línea</span>
+                </div>
+                <span class="track-item__duration">{{ cancion.duracionTexto }}</span>
+                <div class="track-item__actions">
+                  <button
+                    class="track-item__action track-item__action--favorite"
+                    [class.track-item__action--favorite-active]="esFavorito(cancion.idVideoYoutube)"
+                    (click)="alternarFavorito(cancion, $event)"
+                    [title]="esFavorito(cancion.idVideoYoutube) ? 'Eliminar de favoritos' : 'Agregar a favoritos'">
+                    <fa-icon [icon]="esFavorito(cancion.idVideoYoutube) ? icons.like : icons.likeOutline"></fa-icon>
+                  </button>
+                  @if (esPropietario()) {
+                    <button
+                      class="track-item__action track-item__action--delete"
+                      (click)="eliminarCancion(cancion, $event)"
+                      title="Eliminar">
+                      <fa-icon [icon]="icons.delete"></fa-icon>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+

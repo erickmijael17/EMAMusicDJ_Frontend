@@ -1,0 +1,305 @@
+<div class="playlist-list">
+  <!-- Header con título, contador y botón crear -->
+  <div class="playlist-list__header">
+    <div class="playlist-list__title-section">
+      <h2 class="playlist-list__title">Mis Playlists</h2>
+      @if (contadorPlaylists()) {
+        <span class="playlist-list__counter">{{ contadorPlaylists()!.totalListas }} {{ contadorPlaylists()!.totalListas === 1 ? 'playlist' : 'playlists' }}</span>
+      }
+    </div>
+    <div class="playlist-list__actions">
+      <button
+        class="playlist-list__public-btn"
+        (click)="togglePublicPlaylists()"
+        [class.active]="showPublicPlaylists()">
+        <fa-icon [icon]="icons.search"></fa-icon>
+        <span>{{ showPublicPlaylists() ? 'Ocultar Públicas' : 'Ver Públicas' }}</span>
+      </button>
+      <button
+        class="playlist-list__create-btn"
+        (click)="toggleCreateForm()"
+        [attr.aria-label]="showCreateForm() ? 'Cancelar crear playlist' : 'Crear nueva playlist'">
+        <fa-icon [icon]="showCreateForm() ? icons.close : icons.add"></fa-icon>
+        <span>{{ showCreateForm() ? 'Cancelar' : 'Nueva Playlist' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulario de crear playlist -->
+  @if (showCreateForm()) {
+    <div class="playlist-list__create-form">
+      <form (ngSubmit)="crearPlaylist()" class="create-form">
+        <div class="create-form__field">
+          <label for="titulo" class="create-form__label">Título*</label>
+          <input
+            type="text"
+            id="titulo"
+            class="create-form__input"
+            [value]="formularioCrearPlaylist().titulo"
+            (input)="onTituloInput($event)"
+            placeholder="Nombre de la playlist"
+            maxlength="100"
+            required>
+        </div>
+
+        <div class="create-form__field">
+          <label for="descripcion" class="create-form__label">Descripción</label>
+          <textarea
+            id="descripcion"
+            class="create-form__textarea"
+            [value]="formularioCrearPlaylist().descripcion"
+            (input)="onDescripcionInput($event)"
+            placeholder="Describe tu playlist (opcional)"
+            maxlength="255"
+            rows="3"></textarea>
+        </div>
+
+        <div class="create-form__field">
+          <label for="urlImagenPortada" class="create-form__label">URL de la Portada</label>
+          <input
+            type="url"
+            id="urlImagenPortada"
+            class="create-form__input"
+            [value]="formularioCrearPlaylist().urlImagenPortada"
+            (input)="onUrlImagenInput($event)"
+            placeholder="https://ejemplo.com/portada.jpg">
+        </div>
+
+        <div class="create-form__checkboxes">
+          <label class="create-form__checkbox">
+            <input
+              type="checkbox"
+              [checked]="formularioCrearPlaylist().esPublica"
+              (change)="onEsPublicaChange($event)">
+            <span>Hacer pública</span>
+          </label>
+
+          <label class="create-form__checkbox">
+            <input
+              type="checkbox"
+              [checked]="formularioCrearPlaylist().esColaborativa"
+              (change)="onEsColaborativaChange($event)">
+            <span>Modo colaborativo</span>
+          </label>
+        </div>
+
+        <div class="create-form__actions">
+          <button
+            type="button"
+            class="create-form__cancel"
+            (click)="toggleCreateForm()">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="create-form__submit"
+            [disabled]="!formularioCrearPlaylist().titulo.trim() || isLoading()">
+            <fa-icon [icon]="icons.check"></fa-icon>
+            <span>{{ isLoading() ? 'Creando...' : 'Crear Playlist' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Búsqueda de playlists públicas -->
+  @if (showPublicPlaylists()) {
+    <div class="playlist-list__public-search">
+      <h3>Playlists Públicas</h3>
+      <form (submit)="onBuscarPublicasSubmit($event)" class="public-search">
+        <input
+          type="text"
+          class="public-search__input"
+          [value]="terminoBusquedaPublica()"
+          (input)="onTerminoBusquedaInput($event)"
+          placeholder="Buscar playlists públicas...">
+        <button type="submit" class="public-search__btn">
+          <fa-icon [icon]="icons.search"></fa-icon>
+        </button>
+      </form>
+    </div>
+  }
+
+  <!-- Estado de error -->
+  @if (error()) {
+    <div class="playlist-list__error">
+      <fa-icon [icon]="icons.error"></fa-icon>
+      <span>{{ error() }}</span>
+      <button
+        class="playlist-list__error-close"
+        (click)="clearError()"
+        aria-label="Cerrar mensaje de error">
+        <fa-icon [icon]="icons.close"></fa-icon>
+      </button>
+    </div>
+  }
+
+  <!-- Estado de carga -->
+  @if (isLoading() && playlists().length === 0 && !showPublicPlaylists()) {
+    <div class="playlist-list__loading">
+      <div class="loading-spinner"></div>
+      <span>Cargando playlists...</span>
+    </div>
+  }
+
+  <!-- Lista de playlists públicas -->
+  @if (showPublicPlaylists() && playlistsPublicas().length > 0) {
+    <div class="playlist-list__grid">
+      @for (playlist of playlistsPublicas(); track playlist.listaId) {
+        <div class="playlist-card" [routerLink]="['/playlists', playlist.listaId]">
+          <div class="playlist-card__thumbnail">
+            @if (playlist.urlImagenPortada) {
+              <img
+                [src]="playlist.urlImagenPortada"
+                [alt]="'Portada de ' + playlist.titulo"
+                class="playlist-card__image"
+                loading="lazy"
+                (error)="$event.target.style.display = 'none'">
+            } @else {
+              <div class="playlist-card__image-placeholder">
+                <fa-icon [icon]="icons.playlist"></fa-icon>
+              </div>
+            }
+            <div class="playlist-card__overlay">
+              <span class="playlist-card__track-count">
+                {{ playlist.totalCanciones }} {{ playlist.totalCanciones === 1 ? 'canción' : 'canciones' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="playlist-card__info">
+            <h3 class="playlist-card__title">{{ playlist.titulo }}</h3>
+            @if (playlist.descripcion) {
+              <p class="playlist-card__description">{{ playlist.descripcion }}</p>
+            }
+            <div class="playlist-card__meta">
+              <div class="playlist-card__owner">
+                <fa-icon [icon]="icons.profile"></fa-icon>
+                <span>{{ playlist.nombreUsuario }}</span>
+              </div>
+              <span class="playlist-card__public-badge">Pública</span>
+              @if (playlist.esColaborativa) {
+                <span class="playlist-card__collab-badge">Colaborativa</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!showPublicPlaylists() && playlists().length > 0) {
+    <div class="playlist-list__grid">
+      @for (playlist of playlists(); track playlist.listaId) {
+        <article class="playlist-card" [routerLink]="['/playlists', playlist.listaId]">
+          <div class="playlist-card__thumbnail">
+            @if (playlist.urlImagenPortada) {
+              <img
+                [src]="playlist.urlImagenPortada"
+                [alt]="'Portada de ' + playlist.titulo"
+                class="playlist-card__image"
+                loading="lazy"
+                (error)="$event.target.style.display = 'none'">
+            } @else {
+              <div class="playlist-card__image-placeholder">
+                <fa-icon [icon]="icons.playlist"></fa-icon>
+              </div>
+            }
+
+            <div class="playlist-card__overlay">
+              <button
+                class="playlist-card__play-btn"
+                (click)="reproducirPlaylist(playlist, $event)"
+                [attr.aria-label]="'Reproducir ' + playlist.titulo">
+                <fa-icon [icon]="icons.play"></fa-icon>
+              </button>
+            </div>
+
+            <div class="playlist-card__info-overlay">
+              <span class="playlist-card__track-count">
+                <fa-icon [icon]="icons.music"></fa-icon>
+                {{ playlist.totalCanciones }}
+              </span>
+            </div>
+          </div>
+
+          <div class="playlist-card__content">
+            <div class="playlist-card__header">
+              <h3 class="playlist-card__title" [title]="playlist.titulo">{{ playlist.titulo }}</h3>
+              <div class="playlist-card__badges">
+                @if (playlist.esPublica) {
+                  <span class="playlist-card__badge playlist-card__badge--public">
+                    <fa-icon [icon]="icons.search"></fa-icon>
+                    Pública
+                  </span>
+                }
+                @if (playlist.esColaborativa) {
+                  <span class="playlist-card__badge playlist-card__badge--collab">
+                    <fa-icon [icon]="icons.community"></fa-icon>
+                    Colaborativa
+                  </span>
+                }
+              </div>
+            </div>
+
+            @if (playlist.descripcion) {
+              <p class="playlist-card__description" [title]="playlist.descripcion">
+                {{ playlist.descripcion }}
+              </p>
+            }
+
+            <div class="playlist-card__meta">
+              <div class="playlist-card__meta-item">
+                <fa-icon [icon]="icons.profile"></fa-icon>
+                <span>{{ playlist.nombreUsuario }}</span>
+              </div>
+              <div class="playlist-card__meta-item">
+                <fa-icon [icon]="icons.calendar"></fa-icon>
+                <span>{{ formatearFechaCreacion(playlist.fechaCreacion) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="playlist-card__actions">
+            <button
+              class="playlist-card__action"
+              [routerLink]="['/playlists', playlist.listaId, 'edit']"
+              (click)="$event.stopPropagation()"
+              title="Editar playlist"
+              [attr.aria-label]="'Editar ' + playlist.titulo">
+              <fa-icon [icon]="icons.edit"></fa-icon>
+            </button>
+            <button
+              class="playlist-card__action playlist-card__action--danger"
+              (click)="eliminarPlaylist(playlist, $event)"
+              title="Eliminar playlist"
+              [attr.aria-label]="'Eliminar ' + playlist.titulo">
+              <fa-icon [icon]="icons.delete"></fa-icon>
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  <!-- Estado vacío -->
+  @if (!showPublicPlaylists() && playlists().length === 0 && !isLoading()) {
+    <div class="playlist-list__empty">
+      <fa-icon [icon]="icons.playlist" class="playlist-list__empty-icon"></fa-icon>
+      <h3>No tienes playlists</h3>
+      <p>Crea tu primera playlist para comenzar a organizar tu música</p>
+      <button class="playlist-list__empty-btn" (click)="toggleCreateForm()">
+        <fa-icon [icon]="icons.add"></fa-icon>
+        <span>Crear Playlist</span>
+      </button>
+    </div>
+  }
+
+  @if (showPublicPlaylists() && playlistsPublicas().length === 0 && !isLoading()) {
+    <div class="playlist-list__empty">
+      <fa-icon [icon]="icons.search" class="playlist-list__empty-icon"></fa-icon>
+      <h3>No se encontraron playlists públicas</h3>
+      <p>Intenta con otro término de búsqueda</p>
+    </div>
+  }
+</div>

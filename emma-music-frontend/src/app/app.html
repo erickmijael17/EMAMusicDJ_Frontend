@@ -1,0 +1,14 @@
+<div class="app-layout" [class.has-player]="tieneCancionActiva()">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-panel">
+    <app-header></app-header>
+
+    <main class="app-content" role="main">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
+
+<app-player-controls></app-player-controls>
+<app-notificaciones></app-notificaciones>

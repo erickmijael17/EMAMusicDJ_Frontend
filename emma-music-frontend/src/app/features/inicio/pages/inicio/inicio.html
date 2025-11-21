@@ -1,0 +1,110 @@
+<div class="inicio-container">
+  <section class="greeting">
+    <h1>
+      {{ obtenerSaludo() }}{{ obtenerNombreUsuario() ? ', ' + obtenerNombreUsuario() : '' }}
+    </h1>
+  </section>
+
+  @if (estaCargando()) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <span>Cargando tu música...</span>
+    </div>
+  }
+
+  @if (!estaCargando()) {
+    <section class="playlists-grid">
+      <a [routerLink]="['/biblioteca']" class="playlist-card">
+        <img
+          [src]="cancionesFavoritas().length > 0 ? obtenerImagenPista(cancionesFavoritas()[0]) : ''"
+          [alt]="'Canciones que te gustan'"
+          (error)="onErrorImagen($event)"
+          loading="lazy"
+        />
+        <span>Canciones que te gustan</span>
+      </a>
+
+      @for (playlist of playlists().slice(0, 5); track playlist.listaId) {
+        <a [routerLink]="['/playlists', playlist.listaId]" class="playlist-card">
+          <img
+            [src]="obtenerImagenPlaylist(playlist)"
+            [alt]="playlist.titulo"
+            (error)="onErrorImagen($event)"
+            loading="lazy"
+          />
+          <span>{{ playlist.titulo }}</span>
+        </a>
+      }
+    </section>
+
+    @if (playlists().length > 0) {
+      <section class="section">
+        <div class="section-header">
+          <h2>Hecho para ti</h2>
+          <a [routerLink]="['/playlists']" class="see-all">Ver todo</a>
+        </div>
+
+        <div class="cards-scroll">
+          @for (playlist of playlists().slice(0, 10); track playlist.listaId) {
+            <div class="music-card" (click)="reproducirPlaylist(playlist)">
+              <div class="card-image album">
+                @if (obtenerImagenPlaylist(playlist)) {
+                  <img
+                    [src]="obtenerImagenPlaylist(playlist)"
+                    [alt]="playlist.titulo"
+                    (error)="onErrorImagen($event)"
+                  />
+                } @else {
+                  <fa-icon [icon]="iconos.music" size="3x"></fa-icon>
+                }
+              </div>
+              <h3>{{ playlist.titulo }}</h3>
+              <p>{{ playlist.totalCanciones }} canciones</p>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (cancionesFavoritas().length > 0) {
+      <section class="section">
+        <div class="section-header">
+          <h2>Escuchado recientemente</h2>
+          <a [routerLink]="['/biblioteca']" class="see-all">Ver todo</a>
+        </div>
+
+        <div class="cards-scroll">
+          @for (favorito of cancionesFavoritas().slice(0, 10); track favorito.idVideoYoutube) {
+            <div class="music-card" (click)="reproducirFavorita(favorito)">
+              <div class="card-image album">
+                @if (obtenerImagenPista(favorito)) {
+                  <img
+                    [src]="obtenerImagenPista(favorito)"
+                    [alt]="favorito.titulo"
+                    (error)="onErrorImagen($event)"
+                  />
+                } @else {
+                  <fa-icon [icon]="iconos.music" size="3x"></fa-icon>
+                }
+              </div>
+              <h3>{{ favorito.titulo }}</h3>
+              <p>{{ favorito.duracionTexto || formatearDuracion(favorito.duracionSegundos || 0) }}</p>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (playlists().length === 0 && cancionesFavoritas().length === 0) {
+      <div class="empty-state">
+        <fa-icon [icon]="iconos.music" class="empty-icon"></fa-icon>
+        <h3 class="empty-title">Comienza a explorar</h3>
+        <p class="empty-text">Busca música, crea playlists y marca tus canciones favoritas</p>
+        <a [routerLink]="['/buscar']" class="empty-action">
+          <fa-icon [icon]="iconos.search"></fa-icon>
+          <span>Buscar música</span>
+        </a>
+      </div>
+    }
+  }
+</div>

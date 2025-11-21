@@ -1,0 +1,119 @@
+<header class="app-header">
+  <div class="header-left">
+    <button class="nav-btn" [routerLink]="['/inicio']" title="Ir a inicio" aria-label="Ir a inicio">
+      <fa-icon [icon]="iconos.home"></fa-icon>
+    </button>
+  </div>
+
+  <div class="header-center">
+    <div class="search-bar" [class.active]="esBusquedaActiva()">
+      <fa-icon [icon]="iconos.search" class="search-icon"></fa-icon>
+      <input
+        type="text"
+        placeholder="¿Qué quieres escuchar?"
+        [value]="consultaBusqueda()"
+        (input)="onInputBusqueda($event)"
+        (keypress)="onKeyPress($event)"
+        (focus)="onFocusBusqueda()"
+        autocomplete="off"
+        aria-label="Buscar canciones, artistas o álbumes"
+      />
+      @if (esBusquedaActiva()) {
+        <button
+          class="clear-button"
+          (click)="limpiarBusqueda()"
+          type="button"
+          title="Limpiar búsqueda"
+          aria-label="Limpiar búsqueda">
+          <fa-icon [icon]="iconos.close"></fa-icon>
+        </button>
+        <button
+          class="search-button"
+          (click)="realizarBusqueda()"
+          type="button"
+          title="Buscar"
+          aria-label="Buscar">
+          <fa-icon [icon]="iconos.search"></fa-icon>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="header-right">
+    @if (estaAutenticado$ | async) {
+      @if (usuarioActual$ | async; as user) {
+        <div class="user-profile-wrapper">
+          <button
+            class="user-profile"
+            (click)="toggleMenuUsuario()"
+            [class.active]="mostrarMenuUsuario()"
+            aria-label="Menú de usuario"
+            aria-haspopup="true"
+            [attr.aria-expanded]="mostrarMenuUsuario()">
+            <img
+              [src]="user.urlImagenPerfil || obtenerAvatarPorDefecto()"
+              [alt]="'Avatar de ' + user.nombreUsuario"
+              class="user-avatar"
+            />
+            <span class="user-name">{{ user.nombreUsuario }}</span>
+            <fa-icon
+              [icon]="iconos.moreVertical"
+              class="dropdown-icon"
+              [class.rotated]="mostrarMenuUsuario()">
+            </fa-icon>
+          </button>
+
+          @if (mostrarMenuUsuario()) {
+            <div class="user-menu" (click)="$event.stopPropagation()">
+              <div class="menu-header">
+                <div class="menu-user-info">
+                  <img
+                    [src]="user.urlImagenPerfil || obtenerAvatarPorDefecto()"
+                    [alt]="'Avatar de ' + user.nombreUsuario"
+                    class="menu-avatar"
+                  />
+                  <div class="menu-user-details">
+                    <span class="menu-user-name">{{ user.nombreUsuario }}</span>
+                    <span class="menu-user-email">{{ user.email }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="menu-divider"></div>
+              <button class="menu-item" (click)="navegarAPerfil()">
+                <fa-icon [icon]="iconos.profile"></fa-icon>
+                <span>Mi Perfil</span>
+              </button>
+              <button class="menu-item" (click)="navegarABiblioteca()">
+                <fa-icon [icon]="iconos.library"></fa-icon>
+                <span>Mi Biblioteca</span>
+              </button>
+              <button class="menu-item" (click)="navegarAPlaylists()">
+                <fa-icon [icon]="iconos.playlist"></fa-icon>
+                <span>Mis Playlists</span>
+              </button>
+              <div class="menu-divider"></div>
+              <button class="menu-item danger" (click)="cerrarSesion()">
+                <fa-icon [icon]="iconos.logout"></fa-icon>
+                <span>Cerrar sesión</span>
+              </button>
+            </div>
+          }
+        </div>
+      }
+    } @else {
+      <div class="auth-buttons">
+        <a routerLink="/auth/register" class="btn btn-secondary">
+          Registrarse
+        </a>
+        <a routerLink="/auth/login" class="btn btn-primary">
+          Iniciar sesión
+        </a>
+      </div>
+    }
+  </div>
+</header>
+
+@if (mostrarMenuUsuario()) {
+  <div class="menu-overlay" (click)="cerrarMenuUsuario()"></div>
+}
+

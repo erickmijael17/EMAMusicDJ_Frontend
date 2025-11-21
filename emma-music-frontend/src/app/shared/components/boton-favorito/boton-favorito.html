@@ -1,0 +1,38 @@
+<div class="boton-favorito-container">
+  <button
+    class="boton-favorito"
+    [class.favorito]="esFavorito()"
+    [class.pequeno]="tamanio === 'pequeno'"
+    [class.mediano]="tamanio === 'mediano'"
+    [class.grande]="tamanio === 'grande'"
+    [class.error]="tieneError()"
+    [disabled]="cargando() || !usuarioId || !idVideoYoutube"
+    [title]="tituloBoton()"
+    (click)="alternar()">
+
+    @if (!cargando() && !tieneError()) {
+      <span>{{ esFavorito() ? '❤️' : '🤍' }}</span>
+    }
+
+    @if (cargando()) {
+      <span class="spinner"></span>
+    }
+
+    @if (tieneError() && !cargando()) {
+      <span class="icono-error">{{ errorInfo()?.icono || '⚠️' }}</span>
+    }
+  </button>
+
+  @if (mostrarTooltip() && errorInfo()) {
+    <div class="mensaje-error-tooltip" (click)="cerrarTooltip()">
+      <div class="tooltip-header">
+        <span class="tooltip-icono">{{ errorInfo()!.icono }}</span>
+        <span class="tooltip-titulo">{{ errorInfo()!.titulo }}</span>
+        <button class="tooltip-cerrar" (click)="cerrarTooltip()">×</button>
+      </div>
+      <div class="tooltip-mensaje">{{ errorInfo()!.mensaje }}</div>
+      <div class="tooltip-accion">💡 {{ errorInfo()!.accion }}</div>
+    </div>
+  }
+</div>
+

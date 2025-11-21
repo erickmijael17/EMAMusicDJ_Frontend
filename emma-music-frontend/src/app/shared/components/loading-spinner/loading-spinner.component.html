@@ -1,0 +1,7 @@
+<div class="loading-spinner-container" [class]="'loading-spinner-container--' + size">
+  <div class="spinner"></div>
+  @if (mostrarMensaje) {
+    <p class="loading-mensaje">{{ mensaje }}</p>
+  }
+</div>
+

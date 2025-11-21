@@ -1,0 +1,199 @@
+<div class="perfil-container">
+  <div class="perfil-header">
+    <h1 class="page-title">Mi Perfil</h1>
+    <p class="page-subtitle">Gestiona tu cuenta y preferencias</p>
+  </div>
+
+  @if (error()) {
+    <div class="perfil-error">
+      <fa-icon [icon]="iconos.error"></fa-icon>
+      <span>{{ error() }}</span>
+      <button class="error-close" (click)="limpiarError()" type="button">
+        <fa-icon [icon]="iconos.close"></fa-icon>
+      </button>
+    </div>
+  }
+
+  @if (usuario()) {
+    <div class="perfil-content">
+      <div class="perfil-card">
+        <div class="perfil-avatar-section">
+          <div class="avatar-container">
+            @if (usuario()!.urlImagenPerfil) {
+              <img
+                [src]="usuario()!.urlImagenPerfil"
+                [alt]="usuario()!.nombreUsuario"
+                (error)="onErrorImagen($event)"
+                class="avatar-image"
+              />
+            } @else {
+              <div class="avatar-placeholder">
+                {{ obtenerIniciales() }}
+              </div>
+            }
+          </div>
+
+          <div class="perfil-info">
+            <h2 class="perfil-nombre">
+              {{ usuario()!.nombre && usuario()!.apellido 
+                ? usuario()!.nombre + ' ' + usuario()!.apellido 
+                : usuario()!.nombreUsuario }}
+            </h2>
+            <p class="perfil-username">@{{ usuario()!.nombreUsuario }}</p>
+            <p class="perfil-email">{{ usuario()!.email }}</p>
+            @if (usuario()!.nivelSuscripcion) {
+              <span class="perfil-badge">{{ usuario()!.nivelSuscripcion }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="perfil-actions">
+          <button
+            class="btn-edit"
+            (click)="alternarFormularioEdicion()"
+            type="button"
+          >
+            <fa-icon [icon]="iconos.edit"></fa-icon>
+            <span>{{ mostrarFormularioEdicion() ? 'Cancelar' : 'Editar Perfil' }}</span>
+          </button>
+        </div>
+      </div>
+
+      @if (mostrarFormularioEdicion()) {
+        <div class="perfil-edit-form">
+          <h3 class="form-title">Editar Información</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Nombre</label>
+            <input
+              type="text"
+              class="form-input"
+              [value]="formularioEdicion().nombre"
+              (input)="actualizarCampo('nombre', $any($event.target).value)"
+              placeholder="Tu nombre"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Apellido</label>
+            <input
+              type="text"
+              class="form-input"
+              [value]="formularioEdicion().apellido"
+              (input)="actualizarCampo('apellido', $any($event.target).value)"
+              placeholder="Tu apellido"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nombre de Usuario</label>
+            <input
+              type="text"
+              class="form-input"
+              [value]="formularioEdicion().nombreUsuario"
+              (input)="actualizarCampo('nombreUsuario', $any($event.target).value)"
+              placeholder="Nombre de usuario"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-input"
+              [value]="formularioEdicion().email"
+              (input)="actualizarCampo('email', $any($event.target).value)"
+              placeholder="tu@email.com"
+              required
+            />
+          </div>
+
+          <div class="form-actions">
+            <button
+              class="btn-cancel"
+              (click)="alternarFormularioEdicion()"
+              type="button"
+            >
+              Cancelar
+            </button>
+            <button
+              class="btn-save"
+              (click)="guardarCambios()"
+              [disabled]="estaCargando()"
+              type="button"
+            >
+              @if (estaCargando()) {
+                <span>Guardando...</span>
+              } @else {
+                <fa-icon [icon]="iconos.check"></fa-icon>
+                <span>Guardar Cambios</span>
+              }
+            </button>
+          </div>
+        </div>
+      }
+
+      <div class="perfil-stats">
+        <div class="stat-card">
+          <fa-icon [icon]="iconos.like" class="stat-icon"></fa-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ estadisticas().totalFavoritas }}</div>
+            <div class="stat-label">Canciones favoritas</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <fa-icon [icon]="iconos.playlist" class="stat-icon"></fa-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ estadisticas().totalPlaylists }}</div>
+            <div class="stat-label">Playlists</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="perfil-settings">
+        <h3 class="settings-title">Configuración</h3>
+        
+        <div class="settings-section">
+          <button class="settings-item" type="button">
+            <fa-icon [icon]="iconos.settings"></fa-icon>
+            <span>Preferencias</span>
+            <fa-icon [icon]="iconos.next"></fa-icon>
+          </button>
+
+          <button class="settings-item" type="button">
+            <fa-icon [icon]="iconos.music"></fa-icon>
+            <span>Calidad de Audio</span>
+            <fa-icon [icon]="iconos.next"></fa-icon>
+          </button>
+
+          <button class="settings-item" type="button">
+            <fa-icon [icon]="iconos.lock"></fa-icon>
+            <span>Cambiar Contraseña</span>
+            <fa-icon [icon]="iconos.next"></fa-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="perfil-danger-zone">
+        <h3 class="danger-title">Zona de Peligro</h3>
+        <button
+          class="btn-logout"
+          (click)="cerrarSesion()"
+          type="button"
+        >
+          <fa-icon [icon]="iconos.logout"></fa-icon>
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div class="perfil-loading">
+      <div class="loading-spinner"></div>
+      <span>Cargando información del perfil...</span>
+    </div>
+  }
+</div>
+
+
